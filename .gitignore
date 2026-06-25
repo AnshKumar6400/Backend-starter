@@ -7,4 +7,3 @@ package-lock.json
 
 # Prisma generated client
 src/generated/
-src/config/generated/

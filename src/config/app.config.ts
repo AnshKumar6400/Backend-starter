@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Pool } from 'pg';
-import { PrismaClient } from '@/config/generated/prisma/client';
+import { PrismaClient } from '@/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 export const config = {
