@@ -2,14 +2,13 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
-import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 //e3dprmhcc
 const app = express();
 dotenv.config();
-const PORT:string =process.env.PORT || "5000";
+const PORT =process.env.PORT || "5000";
 const rateLimiter = rateLimit({
     windowMs:5*60*1000,
     max:100,
@@ -26,6 +25,6 @@ app.use(cors({origin:process.env.CORS_ORIGIN,credentials:true}));
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
-app.use(PORT, ()=>{
+app.use(PORT||"5000", ()=>{
 `Connected tp ${PORT}`
 });
