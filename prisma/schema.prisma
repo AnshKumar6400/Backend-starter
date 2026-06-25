@@ -6,9 +6,25 @@
 generator client {
   provider        = "prisma-client"
   output          = "../src/generated/prisma"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
+}
+//models
+
+model User{
+  id Int @id @default(autoincrement())
+  email String @unique 
+  password String
+  name String 
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  resetToken String?
+  resetTokenExpiresAt DateTime?
+  refreshToken String?
+  refreshTokenExpiresAt DateTime?
 }
