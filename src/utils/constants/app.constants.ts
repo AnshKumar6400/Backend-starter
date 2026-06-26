@@ -5,7 +5,7 @@ export const APPLICATION_ENV_TYPES = {
 
 export const ERROR_CODES = {
   P2002: {
-    code: "2002",
+    code: "P2002",
     message: "Already exists",
   },
   E500:{
@@ -14,7 +14,7 @@ export const ERROR_CODES = {
   },
   E401:{
     code: "401",
-    message: "Not Found",
+    message: "Unauthorized",
   },
   E404:{
     code: "404",

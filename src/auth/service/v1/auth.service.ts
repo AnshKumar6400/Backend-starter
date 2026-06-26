@@ -8,7 +8,7 @@ import {
 } from "@/utils/helpers/app.helpers";
 import { ERROR_CODES } from "@/utils/constants/app.constants";
 
-class AuthService {
+export class AuthService {
   /**
    * @param fullName
    * @param email
@@ -30,14 +30,12 @@ class AuthService {
           name: fullName,
           isActive: true,
           isDeleted: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
       });
       return user;
     } catch (e: any) {
       if (e.code === ERROR_CODES.P2002.code) {
-        throw new Error();
+        throw new Error(ERROR_CODES.P2002.message);
       }
       throw new Error(e.message);
     }
@@ -49,16 +47,20 @@ class AuthService {
  * @param password 
  * @returns Promise<object>
  */
-  static async Login(email: string, password: string):Promise<object> {
-    const user = await findByEmail(email);
-    if(!user){
+  static async login(email: string, password: string): Promise<object> {
+    try {
+      const user = await findByEmail(email);
+      if (!user) {
         throw new Error(ERROR_CODES.E404.message);
-    }
-    if(!(await comparePassword(password, user.password))){
+      }
+      if (!(await comparePassword(password, user.password))) {
         throw new Error(ERROR_CODES.E401.message);
+      }
+      const accessToken = generateJwtToken({ id: user.id, email: user.email }, "ACCESS");
+      const refreshToken = generateJwtToken({ id: user.id, email: user.email }, "REFRESH");
+      return { accessToken, refreshToken };
+    } catch (e: any) {
+      throw new Error(e.message);
     }
-    const accessToken=generateJwtToken(user,"ACCESS");
-    const refreshToken=generateJwtToken(user,"REFRESH");
-    return {accessToken,refreshToken} as object;
   }
 }
