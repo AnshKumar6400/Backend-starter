@@ -78,12 +78,11 @@ export class AuthController {
   /**
    * @route   POST /api/v1/auth/logout
    * @access  Private
-   * @param   {string} req.cookies.accessToken
+   * @param   {JwtPayload} req.user - Attached by validateToken middleware
    * @returns Clears accessToken + refreshToken cookies
    */
   static async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      await AuthService.logout(req.cookies?.accessToken);
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
       ApiResponse.success(res, null, "Logout Successful", SUCCESS_CODES.SUCCESS);

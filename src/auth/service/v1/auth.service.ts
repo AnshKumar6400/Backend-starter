@@ -90,22 +90,8 @@ export class AuthService {
       throw new CustomError(ERROR_CODES.E401.message, 401);
     }
   }
-  /**
-   * @param {string} accessToken
-   * @returns Promise<void>
-   */
-  static async logout(accessToken: string): Promise<void> {
-    try {
-      const user = await prisma.user.findUnique({
-        where: {
-          id: verifyJwtToken(accessToken, "ACCESS").id,
-        },
-      });
-      if (!user) {
-        throw new CustomError(ERROR_CODES.E401.message, 401);
-      }
-    } catch (e: any) {
-      throw new CustomError(ERROR_CODES.E401.message, 401);
-    }
+  static async resetPassword(email:string){
+    const user = await findByEmail(email);
   }
 }
+
