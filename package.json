@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon --watch src --watch app.ts --ext ts --exec tsx -r tsx/cjs app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

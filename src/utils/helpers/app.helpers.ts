@@ -4,17 +4,15 @@ import { config, prisma } from "@/config/app.config";
 import { ERROR_CODES } from "@/utils/constants/app.constants";
 import { StringValue } from "ms";
 /**
- * 
- * @param password 
- * @returns Promise<string>
+ * @param {string} password - Plain text password
+ * @returns Promise<string> - Bcrypt hash
  */
 export const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, 10);
 };
 /**
- * 
- * @param password 
- * @param hash 
+ * @param {string} password - Plain text password
+ * @param {string} hash - Bcrypt hash to compare against
  * @returns Promise<Boolean>
  */
 export const comparePassword = async (
@@ -24,10 +22,9 @@ export const comparePassword = async (
   return await bcrypt.compare(password, hash);
 };
 /**
- * 
- * @param payload 
- * @param type 
- * @returns string
+ * @param {object} payload - Data to encode in the token
+ * @param {"ACCESS" | "REFRESH"} type - Token type, determines secret and expiry
+ * @returns string - Signed JWT
  */
 export const generateJwtToken = (
   payload: object,
@@ -38,9 +35,18 @@ export const generateJwtToken = (
   return jwt.sign(payload, SECRET!, { expiresIn: EXPIRY as StringValue });
 };
 /**
- * 
- * @param email 
- * @returns object
+ * @param {string} token - JWT to verify
+ * @param {"ACCESS" | "REFRESH"} type - Token type, determines which secret to use
+ * @returns jwt.JwtPayload - Decoded token payload
+ */
+export const verifyJwtToken = (token: string, type: "ACCESS" | "REFRESH"): jwt.JwtPayload => {
+  const secret = type === "ACCESS" ? config.JWT.ACCESS_TOKEN.SECRET : config.JWT.REFRESH_TOKEN.SECRET;
+  return jwt.verify(token, secret) as jwt.JwtPayload;
+};
+
+/**
+ * @param {string} email - User email to look up
+ * @returns Promise<{ id, email, password } | null>
  */
 export const findByEmail = async (
   email: string,

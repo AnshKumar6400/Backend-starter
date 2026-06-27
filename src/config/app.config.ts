@@ -7,6 +7,10 @@ import { APPLICATION_ENV_TYPES } from "@/utils/constants/app.constants";
 export const config = {
   PORT: process.env.PORT || 5000,
   ENV: process.env.NODE_ENV,
+  BASE_URL:
+    process.env.NODE_ENV === APPLICATION_ENV_TYPES.DEV
+      ? process.env.DEV_BASE_URL
+      : process.env.PROD_BASE_URL,
   APPLICATION: {
     NAME: process.env.APPLICATION_NAME,
     VERSION: process.env.APPLICATION_VERSION,
