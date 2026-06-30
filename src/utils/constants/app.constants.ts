@@ -12,14 +12,6 @@ export const SUCCESS_CODES = {
   ACCEPTED: 202,
   NO_CONTENT: 204,
 }
-export const API_ROUTES = {
-  AUTH: {
-    REGISTER: "/register",
-    LOGIN: "/login",
-    REFRESH: "/refresh",
-    LOGOUT: "/logout",
-  },
-} as const;
 export const ERROR_CODES = {
   P2002: {
     code: "P2002",
