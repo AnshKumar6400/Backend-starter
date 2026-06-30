@@ -90,4 +90,24 @@ export class AuthController {
       next(e);
     }
   }
+  static async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try{
+      const { email } = req.body;
+      await AuthService.resetPassword(email);
+      ApiResponse.success(res, null, "Password reset email sent", SUCCESS_CODES.SUCCESS);
+    }
+    catch (e: any) {  
+      next(e);
+    }
+  }
+  static async updatePassword(req: Request, res: Response, next: NextFunction) {
+    const { token, password } = req.body;
+    try {
+      await AuthService.updatePassword(token, password);
+      ApiResponse.success(res, null, "Password updated successfully", SUCCESS_CODES.SUCCESS);
+    }
+    catch (e: any) {
+      next(e);
+    } 
+  }
 }
