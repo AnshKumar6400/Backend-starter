@@ -24,11 +24,11 @@ export const config = {
   },
   JWT: {
     ACCESS_TOKEN: {
-      SECRET: process.env.ACCESS_TOKEN_SECRET as string ,
+      SECRET: process.env.ACCESS_TOKEN_SECRET as string,
       EXPIRY: '1d' as const,
     },
     REFRESH_TOKEN: {
-      SECRET: process.env.REFRESH_TOKEN_SECRET as string ,
+      SECRET: process.env.REFRESH_TOKEN_SECRET as string,
       EXPIRY: '7d' as const,
     },
     COOKIE: {
@@ -38,6 +38,9 @@ export const config = {
       SECURE: process.env.COOKIE_SECURE,
     },
   },
+  RESET_TOKEN: {
+    EXP_TIME: 3600000
+  }
 };
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });

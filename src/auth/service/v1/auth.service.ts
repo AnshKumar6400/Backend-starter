@@ -5,11 +5,13 @@ import {
   comparePassword,
   generateJwtToken,
   verifyJwtToken,
-  findByEmail,
+  generateResetToken,
+  hashToken,
 } from "@/utils/helpers/app.helpers";
+import { findByEmail, findByEmailWithResetToken } from "@/utils/helpers/db.helpers";
 import { ERROR_CODES } from "@/utils/constants/app.constants";
 import { CustomError } from "@/utils/errors/CustomError";
-
+import config from "@/config/app.config";
 export class AuthService {
   /**
    * @param {string} fullName
@@ -90,8 +92,22 @@ export class AuthService {
       throw new CustomError(ERROR_CODES.E401.message, 401);
     }
   }
-  static async resetPassword(email:string){
-    const user = await findByEmail(email);
+  static async resetPassword(email: string) {
+    const user = await findByEmailWithResetToken(email);
+    if (!user) {
+      throw new CustomError(ERROR_CODES.E404.message, 404);
+    }
+    if (!user.isActive) {
+      throw new CustomError(ERROR_CODES.E403.message, 403);
+    }
+    const newResetToken = await generateResetToken(email);
+    const hashedToken = await hashToken(newResetToken);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetToken: hashedToken, resetTokenExpiresAt: new Date(Date.now() + config.RESET_TOKEN.EXP_TIME) },
+    })
+    
+
   }
 }
 

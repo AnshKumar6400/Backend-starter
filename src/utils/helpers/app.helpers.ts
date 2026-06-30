@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config, prisma } from "@/config/app.config";
+import crypto from "node:crypto";
 import { ERROR_CODES } from "@/utils/constants/app.constants";
 import { StringValue } from "ms";
 /**
@@ -10,6 +11,9 @@ import { StringValue } from "ms";
 export const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, 10);
 };
+export const hashToken = async (token: string): Promise<string> => {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
 /**
  * @param {string} password - Plain text password
  * @param {string} hash - Bcrypt hash to compare against
@@ -28,7 +32,7 @@ export const comparePassword = async (
  */
 export const generateJwtToken = (
   payload: object,
-  type: "ACCESS" | "REFRESH",
+  type: "ACCESS" | "REFRESH" ,
 ): string => {
   const { SECRET, EXPIRY } =
     type === "ACCESS" ? config.JWT.ACCESS_TOKEN : config.JWT.REFRESH_TOKEN;
@@ -44,15 +48,6 @@ export const verifyJwtToken = (token: string, type: "ACCESS" | "REFRESH"): jwt.J
   return jwt.verify(token, secret) as jwt.JwtPayload;
 };
 
-/**
- * @param {string} email - User email to look up
- * @returns Promise<{ id, email, password } | null>
- */
-export const findByEmail = async (
-  email: string,
-): Promise<{ id: number; email: string; password: string } | null> => {
-  return prisma.user.findUnique({
-    where: { email },
-    select: { id: true, email: true, password: true },
-  });
-};
+export const generateResetToken = async (email: string): Promise<string> => {
+  return  crypto.randomBytes(32).toString("hex");
+}

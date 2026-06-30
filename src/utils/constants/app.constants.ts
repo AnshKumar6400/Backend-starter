@@ -25,21 +25,28 @@ export const ERROR_CODES = {
     code: "P2002",
     message: "Already exists",
   },
-  E500:{
+  E500: {
     code: "500",
     message: "Internal server error",
   },
-  E401:{
+  E401: {
     code: "401",
     message: "Unauthorized",
   },
-  E404:{
+  E403: {
+    code: "403",
+    message: "Forbidden",
+  },
+  E404: {
     code: "404",
     message: "Not found",
-  }
+  },
+
+
 } as const;
- export const cookieOptions= {
-      httpOnly: true,
-      secure: config.JWT.COOKIE.SECURE === "true",
-      sameSite: (config.JWT.COOKIE.SAME_SITE as "strict" | "lax" | "none") ?? "lax",
-  }
+export const cookieOptions = {
+  httpOnly: true,
+  secure: config.JWT.COOKIE.SECURE === "true",
+  sameSite: (config.JWT.COOKIE.SAME_SITE as "strict" | "lax" | "none") ?? "lax",
+}
+
