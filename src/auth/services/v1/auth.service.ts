@@ -6,12 +6,13 @@ import {
   generateJwtToken,
   verifyJwtToken,
   generateResetToken,
-  hashToken,
+  generateHashToken,
 } from "@/utils/helpers/app.helpers";
 import { findByEmail, findByEmailWithResetToken } from "@/utils/helpers/db.helpers";
 import { ERROR_CODES } from "@/utils/constants/app.constants";
 import { CustomError } from "@/utils/errors/CustomError";
 import config from "@/config/app.config";
+import { sendResetPasswordEmail } from "@/utils/helpers/mail.helpers";
 export class AuthService {
   /**
    * @param {string} fullName
@@ -93,21 +94,47 @@ export class AuthService {
     }
   }
   static async resetPassword(email: string) {
-    const user = await findByEmailWithResetToken(email);
-    if (!user) {
-      throw new CustomError(ERROR_CODES.E404.message, 404);
-    }
-    if (!user.isActive) {
-      throw new CustomError(ERROR_CODES.E403.message, 403);
-    }
-    const newResetToken = await generateResetToken(email);
-    const hashedToken = await hashToken(newResetToken);
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { resetToken: hashedToken, resetTokenExpiresAt: new Date(Date.now() + config.RESET_TOKEN.EXP_TIME) },
-    })
-    
+    try {
+      const user = await findByEmailWithResetToken(email);
+      if (!user) {
+        throw new CustomError(ERROR_CODES.E404.message, 404);
+      }
+      if (!user.isActive) {
+        throw new CustomError(ERROR_CODES.E403.message, 403);
+      }
+      const newResetToken = await generateResetToken(email);
+      const hashedToken = await generateHashToken(newResetToken);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { resetToken: hashedToken, resetTokenExpiresAt: new Date(Date.now() + config.RESET_TOKEN.EXP_TIME) },
+      })
 
+      await sendResetPasswordEmail(email, newResetToken);
+      return user;
+    } catch (e: any) {
+      throw (e instanceof CustomError) ? e : new CustomError(e.message, 500);
+    }
   }
-}
+  static async updatePassword(token: string, password: string) {
+    try {
+      const hashedToken = await generateHashToken(token) as string;
+      const user = await prisma.user.findFirst({
+        where: { resetToken: hashedToken },
+        select: { id: true, email: true, resetTokenExpiresAt: true, },
 
+      });
+      if (!user || !user.resetTokenExpiresAt || user.resetTokenExpiresAt < new Date(Date.now())) {
+        throw new CustomError(ERROR_CODES.E401.message, 401);
+      }
+      const hashedPassword = await hashPassword(password);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword, resetToken: null, resetTokenExpiresAt: null },
+      });
+    }
+    catch (e: any) {
+      throw e instanceof CustomError ? e : new CustomError(e.message, 500);
+    }
+  }
+
+}

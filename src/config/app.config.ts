@@ -15,12 +15,22 @@ export const config = {
     NAME: process.env.APPLICATION_NAME,
     VERSION: process.env.APPLICATION_VERSION,
   },
+  FRONTEND_URL:
+    process.env.NODE_ENV === APPLICATION_ENV_TYPES.DEV
+      ? process.env.DEV_FRONTEND_URL
+      : process.env.PROD_FRONTEND_URL,
   CORS: {
     ORIGIN:
       process.env.NODE_ENV === APPLICATION_ENV_TYPES.DEV
         ? process.env.CORS_DEV_ORIGIN
         : process.env.CORS_PROD_ORIGIN,
     CREDS: true,
+  },
+  SMTP: {
+    HOST: process.env.SMTP_HOST as string,
+    PORT: Number(process.env.SMTP_PORT) ,
+    USER: process.env.SMTP_USER as string,
+    PASS: process.env.SMTP_PASS as string,
   },
   JWT: {
     ACCESS_TOKEN: {
@@ -40,7 +50,8 @@ export const config = {
   },
   RESET_TOKEN: {
     EXP_TIME: 3600000
-  }
+  },
+
 };
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });

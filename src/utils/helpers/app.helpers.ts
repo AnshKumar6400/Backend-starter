@@ -11,7 +11,7 @@ import { StringValue } from "ms";
 export const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, 10);
 };
-export const hashToken = async (token: string): Promise<string> => {
+export const generateHashToken = async (token: string): Promise<string> => {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
 /**
