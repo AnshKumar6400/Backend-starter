@@ -10,5 +10,6 @@ router.post(API_ROUTES.AUTH.LOGIN, validateInput("LOGIN"), AuthController.login)
 router.post(API_ROUTES.AUTH.REFRESH, AuthController.refresh);
 router.post(API_ROUTES.AUTH.LOGOUT, validateToken, AuthController.logout);
 router.post(API_ROUTES.AUTH.RESET_PASSWORD, AuthController.resetPassword);  
+router.post(API_ROUTES.AUTH.UPDATE_PASSWORD,AuthController.updatePassword)
 
 export default router;

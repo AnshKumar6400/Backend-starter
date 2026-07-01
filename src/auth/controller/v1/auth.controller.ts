@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthService } from "@/auth/services/v1/auth.service";
+import { AuthService } from "@/auth/service/v1/auth.service";
 import { config } from "@/config/app.config";
 import { cookieOptions, SUCCESS_CODES } from "@/utils/constants/app.constants";
 import { ApiResponse } from "@/utils/response/APIResponse";
