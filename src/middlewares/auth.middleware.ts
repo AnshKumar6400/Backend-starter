@@ -66,8 +66,27 @@ const validateRegister = (fullName: string, email: string, password: string, nex
  * @returns Express middleware
  */
 export const validateInput = (type: "LOGIN" | "REGISTER") => (req: Request, res: Response, next: NextFunction) => {
-  const { fullName, email, password } = req.body;
-  type === "LOGIN"
-    ? validateLogin(email, password, next)
-    : validateRegister(fullName, email, password, next);
+  try {
+    const { fullName, email, password } = req.body ?? {};
+    type === "LOGIN"
+      ? validateLogin(email, password, next)
+      : validateRegister(fullName, email, password, next);
+  } catch (e: any) {
+    next(new CustomError("Invalid Input", 400));
+  }
+};
+
+export const validateResetPasswordInput = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body ?? {};
+    if (!email) {
+      throw new CustomError("Email is required", 400);
+    }
+    if (!emailRegex.test(email)) {
+      throw new CustomError("Invalid email format", 400);
+    }
+    next();
+  } catch (e: any) {
+    e instanceof CustomError ? next(e) : next(new CustomError("Invalid Input", 400));
+  }
 };

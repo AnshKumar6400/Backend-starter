@@ -83,31 +83,29 @@ export class AuthController {
    */
   static async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      res.clearCookie("accessToken");
-      res.clearCookie("refreshToken");
+      res.clearCookie("accessToken", cookieOptions);
+      res.clearCookie("refreshToken", cookieOptions);
       ApiResponse.success(res, null, "Logout Successful", SUCCESS_CODES.SUCCESS);
     } catch (e: any) {
       next(e);
     }
   }
   static async resetPassword(req: Request, res: Response, next: NextFunction) {
-    try{
+    try {
       const { email } = req.body;
       await AuthService.resetPassword(email);
-      ApiResponse.success(res, null, "Password reset email sent", SUCCESS_CODES.SUCCESS);
-    }
-    catch (e: any) {  
+      ApiResponse.success(res, null, "If registered, a password reset email has been sent", SUCCESS_CODES.SUCCESS);
+    } catch (e: any) {
       next(e);
     }
   }
   static async updatePassword(req: Request, res: Response, next: NextFunction) {
-    const { token, password } = req.body;
     try {
+      const { token, password } = req.body;
       await AuthService.updatePassword(token, password);
       ApiResponse.success(res, null, "Password updated successfully", SUCCESS_CODES.SUCCESS);
-    }
-    catch (e: any) {
+    } catch (e: any) {
       next(e);
-    } 
+    }
   }
 }

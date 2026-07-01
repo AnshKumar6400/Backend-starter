@@ -93,37 +93,31 @@ export class AuthService {
       throw new CustomError(ERROR_CODES.E401.message, 401);
     }
   }
-  static async resetPassword(email: string) {
+  static async resetPassword(email: string): Promise<void> {
     try {
       const user = await findByEmailWithResetToken(email);
-      if (!user) {
-        throw new CustomError(ERROR_CODES.E404.message, 404);
-      }
-      if (!user.isActive) {
-        throw new CustomError(ERROR_CODES.E403.message, 403);
-      }
+      // Return silently when user not found or inactive — prevents email enumeration
+      if (!user || !user.isActive) return;
       const newResetToken = await generateResetToken(email);
       const hashedToken = await generateHashToken(newResetToken);
+      // Send email first; only persist token if email succeeds
+      await sendResetPasswordEmail(email, newResetToken);
       await prisma.user.update({
         where: { id: user.id },
         data: { resetToken: hashedToken, resetTokenExpiresAt: new Date(Date.now() + config.RESET_TOKEN.EXP_TIME) },
-      })
-
-      await sendResetPasswordEmail(email, newResetToken);
-      return user;
+      });
     } catch (e: any) {
-      throw (e instanceof CustomError) ? e : new CustomError(e.message, 500);
+      throw e instanceof CustomError ? e : new CustomError(e.message, 500);
     }
   }
-  static async updatePassword(token: string, password: string) {
+  static async updatePassword(token: string, password: string): Promise<void> {
     try {
-      const hashedToken = await generateHashToken(token) as string;
+      const hashedToken = await generateHashToken(token);
       const user = await prisma.user.findFirst({
         where: { resetToken: hashedToken },
-        select: { id: true, email: true, resetTokenExpiresAt: true, },
-
+        select: { id: true, email: true, isActive: true, resetTokenExpiresAt: true },
       });
-      if (!user || !user.resetTokenExpiresAt || user.resetTokenExpiresAt < new Date(Date.now())) {
+      if (!user || !user.isActive || !user.resetTokenExpiresAt || user.resetTokenExpiresAt < new Date()) {
         throw new CustomError(ERROR_CODES.E401.message, 401);
       }
       const hashedPassword = await hashPassword(password);
@@ -131,8 +125,7 @@ export class AuthService {
         where: { id: user.id },
         data: { password: hashedPassword, resetToken: null, resetTokenExpiresAt: null },
       });
-    }
-    catch (e: any) {
+    } catch (e: any) {
       throw e instanceof CustomError ? e : new CustomError(e.message, 500);
     }
   }

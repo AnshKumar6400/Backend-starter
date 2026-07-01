@@ -15,10 +15,11 @@ export const config = {
     NAME: process.env.APPLICATION_NAME,
     VERSION: process.env.APPLICATION_VERSION,
   },
-  FRONTEND_URL:
+  FRONTEND_URL: (
     process.env.NODE_ENV === APPLICATION_ENV_TYPES.DEV
       ? process.env.DEV_FRONTEND_URL
-      : process.env.PROD_FRONTEND_URL,
+      : process.env.PROD_FRONTEND_URL
+  ) as string,
   CORS: {
     ORIGIN:
       process.env.NODE_ENV === APPLICATION_ENV_TYPES.DEV
